@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import Payment from "@/models/Payment";
 import Order from "@/models/Orders";
 import { connectDB } from "@/lib/mongodb";
+import { sendWhatsAppMessage } from "@/lib/fonnte";
 
 interface PaymentItem {
   productId: string;
@@ -20,23 +21,25 @@ interface PaymentRequestBody {
 
 export async function POST(req: Request) {
   const PAYMENT_SUCCESS_URL = process.env.PAYMENT_SUCCESS_URL || "http://localhost:3000/payment-success";
-  try {
-    const body: PaymentRequestBody = await req.json();
-    const { external_id, email, amount, items } = body;
+  // Ambil userId dari cookies
+  const cookieStore = await cookies();
+  const userCookie = cookieStore.get('user');
+  let userId = ""; // default ke email untuk guest
+  let userWhatsappNumber = ""; // default kosong
 
-    // Ambil userId dari cookies
-    const cookieStore = await cookies();
-    const userCookie = cookieStore.get('user');
-    let userId = email; // default ke email untuk guest
+  try {
 
     if (userCookie) {
       try {
         const userData = JSON.parse(decodeURIComponent(userCookie.value));
         userId = userData._id; // mengambil _id dari data user yang tersimpan
+        userWhatsappNumber = userData.whatsappNumber;
       } catch (e) {
         console.error('Error parsing user cookie:', e);
       }
     }
+    const body: PaymentRequestBody = await req.json();
+    const { external_id, email, amount, items } = body;
 
     if (!external_id || !email || !amount || !items || !items.length) {
       return NextResponse.json(
@@ -127,6 +130,8 @@ export async function POST(req: Request) {
     //update order status to LUNAS if payment is successful
     if (data.id) {
       order.status = "PAID";
+      //send whatsapp notification to user about payment success, whatsappNumber needed
+      await sendWhatsAppMessage(userWhatsappNumber, `Pembayaran berhasil untuk pesanan ${order._id}`);
       await order.save();
     }
 
@@ -138,9 +143,9 @@ export async function POST(req: Request) {
       { error: data.message || "Gagal membuat invoice", data },
       { status: 400 }
     );
-
   } catch (error) {
     console.error("❌ Error di server:", error);
+    await sendWhatsAppMessage(userWhatsappNumber, 'Terjadi kesalahan dalam proses pembayaran');
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

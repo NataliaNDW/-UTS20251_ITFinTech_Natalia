@@ -162,3 +162,38 @@ export const clearOTP = (phoneNumber: string) => {
   otpStore.delete(cleanNumber);
   console.log('🗑️ OTP cleared for:', cleanNumber);
 };
+
+/**
+ * send WhatsApp message (non-OTP)
+ */
+export const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
+  try {
+    const cleanNumber = phoneNumber.replace(/[\+\-\s]/g, '');
+    
+    const response = await axios.post(
+      FONNTE_API_URL,
+      {
+        target: cleanNumber,
+        message: message,
+        countryCode: '62',
+      },
+      {
+        headers: {
+          'Authorization': FONNTE_TOKEN,
+        },
+      }
+    );
+    
+    console.log('✅ Message sent to:', cleanNumber);
+    console.log('Fonnte response:', response.data);
+    
+    return {
+      success: true,
+      message: 'Pesan berhasil dikirim',
+      data: response.data
+    };
+  } catch (error: any) {
+    console.error('❌ Error sending message via Fonnte:', error.response?.data || error.message);
+    throw new Error('Gagal mengirim pesan');
+  }
+};
