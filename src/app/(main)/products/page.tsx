@@ -26,7 +26,6 @@ export default function ProductsPage() {
   const handleAdd = (product: any) => {
     addToCart(product);
     setNotif({ show: true, name: product.name });
-    setTimeout(() => setNotif({ show: false, name: "" }), 3500);
   };
 
   if (loading) return <div className="p-8">Loading...</div>;
