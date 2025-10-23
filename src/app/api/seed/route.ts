@@ -50,7 +50,7 @@ export async function GET() {
       email: "admin@example.com",
       password: await bcrypt.hash("adminpassword", 10),
       role: "admin",
-      whatsappNumber: "081234567890",
+      whatsappNumber: "087787140001",
       whatsappVerified: false,
     });
 

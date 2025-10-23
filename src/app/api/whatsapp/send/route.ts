@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sendWhatsAppMessage } from "@/lib/twilio";
+import { sendWhatsAppMess } from "@/lib/twilio";
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const response = await sendWhatsAppMessage(phoneNumber, message);
+    const response = await sendWhatsAppMess(phoneNumber, message);
 
     return NextResponse.json({
       success: true,
