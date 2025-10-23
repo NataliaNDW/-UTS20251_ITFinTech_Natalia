@@ -4,6 +4,7 @@ import Payment from "@/models/Payment";
 import Order from "@/models/Orders";
 import { connectDB } from "@/lib/mongodb";
 import { sendWhatsAppMessage } from "@/lib/fonnte";
+import { sendWhatsAppMess } from "@/lib/twilio";
 
 interface PaymentItem {
   productId: string;
@@ -132,6 +133,7 @@ export async function POST(req: Request) {
       order.status = "PAID";
       //send whatsapp notification to user about payment success, whatsappNumber needed
       await sendWhatsAppMessage(userWhatsappNumber, `Pembayaran berhasil untuk pesanan ${order._id}`);
+      // await sendWhatsAppMess(userWhatsappNumber, `Pembayaran berhasil untuk pesanan ${order._id}`);
       await order.save();
     }
 
@@ -145,7 +147,8 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.error("❌ Error di server:", error);
-    await sendWhatsAppMessage(userWhatsappNumber, 'Terjadi kesalahan dalam proses pembayaran');
+    // await sendWhatsAppMessage(userWhatsappNumber, 'Terjadi kesalahan dalam proses pembayaran');
+    await sendWhatsAppMess(userWhatsappNumber, 'Terjadi kesalahan dalam proses pembayaran');
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

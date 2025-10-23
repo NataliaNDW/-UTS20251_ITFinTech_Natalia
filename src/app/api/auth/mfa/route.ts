@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/mongodb";
 import response from "twilio/lib/http/response";
 
 import {verifyWhatsAppOTP} from "@/lib/fonnte";
+import { verifyCode } from "@/lib/twilio";
 
 export async function POST(req: Request) {
   try {
@@ -16,6 +17,7 @@ export async function POST(req: Request) {
     }
 
     const isVerified = verifyWhatsAppOTP(user.whatsappNumber, otp);
+    // const isVerified = await verifyCode(user.whatsappNumber, otp);
     if (!isVerified) {
       return NextResponse.json({ error: "Kode OTP salah" }, { status: 401 });
     }

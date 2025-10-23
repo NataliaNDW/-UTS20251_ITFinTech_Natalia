@@ -4,7 +4,7 @@ import { connectDB } from "@/lib/mongodb";
 import bcrypt from "bcryptjs";
 // import { sendVerificationCode, verifyCode } from '@/lib/twilio';
 import { sendWhatsAppOTP } from "@/lib/fonnte";
-
+import { sendVerificationCode } from "@/lib/twilio";
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
