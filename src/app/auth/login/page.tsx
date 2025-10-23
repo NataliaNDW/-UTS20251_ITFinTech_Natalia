@@ -36,7 +36,13 @@ export default function LoginPage() {
 			// Simpan user ke cookie (simple, untuk demo)
 			document.cookie = `user=${encodeURIComponent(JSON.stringify(data.user))}; path=/`;
 			// Redirect ke halaman admin
-			window.location.href = "/admin";
+
+			//if admin
+			if (data.user.role === "admin") {
+				window.location.href = "/admin";
+				return;
+			}
+			window.location.href = "/products";
 		} else {
 			setNotif("Kode OTP salah!");
 		}
